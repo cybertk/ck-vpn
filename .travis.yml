@@ -1,0 +1,17 @@
+---
+sudo: required
+
+services:
+- docker
+env:
+  global:
+  - DOCKER_EMAIL: kyan.ql.he@gmail.com
+  - DOCKER_USERNAME: quanlong
+script:
+- ./test
+after_success:
+- if [[ ! -z "$TRAVIS_TAG" ]]; then docker tag quanlong/ck-vpn:latest quanlong/ck-vpn:${TRAVIS_TAG#v} ; fi
+- docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+- if [[ ! -z "$TRAVIS_TAG" ]] || [[ "${TRAVIS_BRANCH}_${TRAVIS_PULL_REQUEST}" = master_false ]]; then docker push quanlong/ck-vpn ; fi
+notifications:
+  email: false
