@@ -12,6 +12,7 @@ Add init.sh /usr/bin/init
 
 # Web
 ADD web /www
+RUN chown 100:100 -R /www
 
 VOLUME /etc
 
