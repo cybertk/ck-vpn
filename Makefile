@@ -1,4 +1,6 @@
-default:
+default: build debug
+
+build:
 	docker build -t ck-vpn .
 
 debug:
@@ -13,7 +15,7 @@ debug-shell:
 run:
 	docker run
 
-test: test-from-osx-on-vm-ip test-from-vm
+test: test-unit
 
 test-unit:
 	bats tests/*.sh
@@ -24,5 +26,5 @@ test-from-vm:
 test-from-osx-on-vm-ip:
 	sudo charon-cmd --host $(shell docker-machine ip) --identity tester.osx
 
-bootstrap:
-	brew install strongswan
+bootstrap-osx:
+	brew install strongswan bats

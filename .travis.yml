@@ -1,14 +1,13 @@
 ---
-sudo: required
-
-services:
-- docker
+os: osx
 env:
   global:
   - DOCKER_EMAIL: kyan.ql.he@gmail.com
   - DOCKER_USERNAME: quanlong
+before_script:
+- make bootstrap-osx
 script:
-- ./test
+- make test
 after_success:
 - if [[ ! -z "$TRAVIS_TAG" ]]; then docker tag quanlong/ck-vpn:latest quanlong/ck-vpn:${TRAVIS_TAG#v} ; fi
 - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
