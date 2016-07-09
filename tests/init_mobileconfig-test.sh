@@ -6,9 +6,6 @@ fixtures() {
 
     FIXTURE_VALID_DIR="$BATS_TEST_DIRNAME/tmp"
 
-    # Trigger init run as lib
-    CK_VPN_TEST=1
-
     # UUID regex pattern, see http://stackoverflow.com/a/38162719/622662
     UUID_REGEX="[A-F0-9]{8}-[A-F0-9]{4}-4[A-F0-9]{3}-[89AB][A-F0-9]{3}-[A-F0-9]{12}"
 }
@@ -16,7 +13,7 @@ fixtures() {
 setup() {
     mkdir -p "$FIXTURE_VALID_DIR" || true
 
-    . "$SCRIPT_DIR/init.sh" || true
+    CK_VPN_TEST=1 . "$SCRIPT_DIR/init.sh" || true
 }
 
 teardown() {
@@ -35,7 +32,7 @@ fixtures
     expected_server_address="example.com"
     expected_secret="i_am_secret"
 
-    run /bin/sh init_mobileconfig "$expected_server_address" "$expected_secret"
+    run init_mobileconfig "$expected_server_address" "$expected_secret"
 
     # it should exit 0
     [ $status -eq 0 ]

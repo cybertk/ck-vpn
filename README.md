@@ -2,6 +2,7 @@
 
 > IKEv2 VPN Server for iOS/OSX with zero config
 
+[![Build Status](https://travis-ci.org/cybertk/ck-vpn.svg)](https://travis-ci.org/cybertk/ck-vpn)
 [![Docker Hub](https://img.shields.io/badge/docker-ready-blue.svg)](https://registry.hub.docker.com/u/quanlong/ck-vpn/)
 [![Docker image layers and size](https://badge.imagelayers.io/quanlong/ck-vpn:latest.svg)](https://imagelayers.io/?images=quanlong/ck-vpn:latest)
 
