@@ -31,7 +31,7 @@ fixtures
     expected_secret="i_am_secret"
 
     run docker run --rm -it -v $SCRIPT_DIR:/ck-vpn alpine:3.3 /bin/sh -c \
-        "CK_VPN_TEST=1 . /ck-vpn/init.sh; init_mobileconfig "$expected_server_address" "$expected_secret""
+        "CKVPN_TEST=1 . /ck-vpn/init.sh; init_mobileconfig "$expected_server_address" "$expected_secret""
 
     # it should exit 0
     [ $status -eq 0 ]

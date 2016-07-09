@@ -22,10 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Customizations
-CONFIG_VIP=10.0.5.0/24
-CONFIG_HTTP_HOME=/www
-CONFIG_MOBILECONFIG_PATH=$CONFIG_HTTP_HOME/vpn.mobileconfig
+# Customizations, convert prefix CKVPN_* to CONFIG_*
+CONFIG_SERVER_ADDRESS=$CKVPN_SERVER_ADDRESS
+CONFIG_SECRET=$CKVPN_SECRET
+CONFIG_VIP=${CKVPN_VIP:-10.0.5.0/24}
+CONFIG_HTTP_HOME=${CKVPN_HTTP_HOME:-/www}
+CONFIG_MOBILECONFIG_PATH=${CKVPN_MOBILECONFIG_PATH:-$CONFIG_HTTP_HOME/vpn.mobileconfig}
 
 config_route() {
     local vip="$1"
@@ -134,8 +136,8 @@ get_public_ip() {
 main() {
     local server_address secret
 
-    server_address=$(get_public_ip)
-    secret="$(openssl rand -base64 32)"
+    server_address="${CONFIG_SERVER_ADDRESS:-$(get_public_ip)}"
+    secret="${CONFIG_SECRET:-$(openssl rand -base64 32)}"
 
     # Initialize if did not
     if [ ! -f /etc/ipsec.secrets ]; then
@@ -151,8 +153,8 @@ main() {
     httpd -h "$CONFIG_HTTP_HOME"
 
     echo "ck-vpn: starting ipsec"
-    /usr/sbin/ipsec start --nofork $CK_VPN_IPSEC_DEBUG_OPTS
+    /usr/sbin/ipsec start --nofork $CKVPN_IPSEC_DEBUG_OPTS
 }
 
 # [[ "$0" == "$BASH_SOURCE" ]] && main "$@"
-[[ -z "$CK_VPN_TEST" ]] && main "$@"
+[[ -z "$CKVPN_TEST" ]] && main "$@"
