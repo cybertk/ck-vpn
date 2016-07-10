@@ -10,6 +10,18 @@
 
     docker run --privileged -p 80:80 -p 500:500/udp -p 4500:4500/udp quanlong/ck-vpn
 
+## Available Configuration Parameters
+
+*Please refer the docker run command options for the `--env-file` flag where you can specify all required environment variables in a single file. This will save you from writing a potentially long docker run command. Alternatively you can use docker-compose.*
+
+Below is the complete list of available options that can be used to customize your ck-vpn installation.
+
+- **CKVPN_SERVER_ADDRESS:**, The server address. No defaults.
+- **CKVPN_SECRET:** Pre share key of VPN server. Defaults to the 32 random characters.
+- **CKVPN_VIP:** Client's subnet. Defaults to `10.0.5.0/24`.
+- **CKVPN_HTTP_HOME:** The home/root dir of builtin HTTP server(**httpd**). Defaults to `/www`.
+- **CKVPN_MOBILECONFIG_PATH:** The path of generated Apple's VPN profile. Defaults to `$CONFIG_HTTP_HOME/vpn.mobileconfig`.
+
 ## FAQ
 
 ### invalid ID_V1 payload length, decryption failed?

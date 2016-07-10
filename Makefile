@@ -15,10 +15,15 @@ debug-shell:
 run:
 	docker run
 
-test: test-unit
+test: test-unit test-acceptance
+
+test-acceptance:
+	# test-acceptance requires sudo permission
+	@sudo true
+	bats tests/test-acceptance.sh
 
 test-unit:
-	bats tests/*.sh
+	bats tests/*-test.sh
 
 test-from-vm:
 	docker run --rm -it --privileged ck-vpn charon-cmd --host 192.168.99.100 --identity tester.docker
@@ -27,4 +32,8 @@ test-from-osx-on-vm-ip:
 	sudo charon-cmd --host $(shell docker-machine ip) --identity tester.osx
 
 bootstrap-osx:
-	brew install strongswan bats
+	brew update
+	brew install bats nmap docker docker-machine
+	brew cask install virtualbox
+	docker-machine create --driver=virtualbox default
+	docker-machine start
