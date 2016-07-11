@@ -26,6 +26,7 @@
 CONFIG_VIP=10.0.5.0/24
 CONFIG_HTTP_HOME=/www
 CONFIG_MOBILECONFIG_PATH=$CONFIG_HTTP_HOME/vpn.mobileconfig
+CONFIG_IPSEC_SECRETS_PATH=$CONFIG_HTTP_HOME/ipsec.secrets
 
 config_route() {
     local vip="$1"
@@ -41,7 +42,7 @@ config_route() {
 init_ipsec_config() {
     local secret="$1"
 
-    echo ": PSK \"$secret\"" > /etc/ipsec.secrets
+    echo ": PSK \"$secret\""
 }
 
 init_mobileconfig() {
@@ -138,11 +139,13 @@ main() {
     secret="$(openssl rand -base64 32)"
 
     # Initialize if did not
-    if [ ! -f /etc/ipsec.secrets ]; then
+    if [ ! -f "$CONFIG_IPSEC_SECRETS_PATH" ]; then
         echo "ck-vpn: initializing"
-        init_ipsec_config "$secret"
+        init_ipsec_config "$secret" >"$CONFIG_IPSEC_SECRETS_PATH"
         init_mobileconfig "$server_address" "$secret" >"$CONFIG_MOBILECONFIG_PATH"
     fi
+
+    ln -sf "$CONFIG_IPSEC_SECRETS_PATH" /etc/ipsec.secrets
 
     echo "ck-vpn: configuring route tables"
     config_route "$CONFIG_VIP"
