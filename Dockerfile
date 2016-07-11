@@ -13,7 +13,7 @@ Add init.sh /usr/bin/init
 # Web
 ADD web /www
 
-VOLUME /etc
+VOLUME /www
 
 EXPOSE 80 500/udp 4500/udp
 
