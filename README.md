@@ -8,7 +8,28 @@
 
 ## Getting started
 
+### Docker
+
     docker run --privileged -p 80:80 -p 500:500/udp -p 4500:4500/udp quanlong/ck-vpn
+
+### Docker Cloud
+
+Use the following yml as Docker Cloud Stack
+
+```yml
+vpn:
+  autodestroy: always
+  autoredeploy: true
+  image: 'quanlong/ck-vpn:latest'
+  ports:
+    - '80:80'
+    - '500:500/udp'
+    - '4500:4500/udp'
+  privileged: true
+  volumes:
+    - /etc
+    - /www
+```
 
 ## FAQ
 
