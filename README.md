@@ -10,6 +10,10 @@
 
     docker run --privileged -p 80:80 -p 500:500/udp -p 4500:4500/udp quanlong/ck-vpn
 
+## Testing Speed
+
+Test speed at http://www.speedtest.net/
+
 ## FAQ
 
 ### invalid ID_V1 payload length, decryption failed?
