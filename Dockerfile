@@ -4,7 +4,6 @@ FROM alpine:3.3
 RUN apk add --no-cache strongswan=5.3.5-r1
 
 # Strongswan Configuration
-ADD ./vpn_config/ipsec.conf /etc/ipsec.conf
 ADD ./vpn_config/strongswan.conf /etc/strongswan.conf
 
 # Apps

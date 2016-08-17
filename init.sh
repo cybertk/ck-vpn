@@ -27,6 +27,9 @@ CONFIG_VIP=10.0.5.0/24
 CONFIG_HTTP_HOME=/www
 CONFIG_MOBILECONFIG_PATH=$CONFIG_HTTP_HOME/vpn.mobileconfig
 CONFIG_IPSEC_SECRETS_PATH=$CONFIG_HTTP_HOME/ipsec.secrets
+CONFIG_FETCH_SECRET=iamtherelaysecret
+CONFIG_FETCH_SECRET=h8Qt7snfC9xvdOCysq1SDs5di2n16bKo7NOPC+zOnrw= # TODO: this is for debug, remove
+CONFIG_FETCH_SERVER=40.83.123.139
 
 config_route() {
     local vip="$1"
@@ -39,10 +42,73 @@ config_route() {
     iptables -t nat -A POSTROUTING -s $vip -o eth0 -j MASQUERADE
 }
 
-init_ipsec_config() {
+init_ipsec_secret() {
     local secret="$1"
 
     echo ": PSK \"$secret\""
+}
+
+init_ipsec_config() {
+    cat <<EOF
+# /etc/ipsec.conf - strongSwan IPsec configuration file
+#
+# Based on http://www.strongswan.org/uml/testresults/ikev2/rw-psk-ipv4/
+
+config setup
+
+# inherit by all other conns
+# For manual, see https://wiki.strongswan.org/projects/strongswan/wiki/ConnSection
+conn %default
+    ikelifetime=60m
+    keylife=20m
+    rekeymargin=3m
+    keyingtries=1
+    keyexchange=ikev2
+    authby=secret
+    forceencaps=yes
+
+# left is local, right is 2nd-level gateway
+conn relay
+    left=%defaultroute
+    leftsubnet=0.0.0.0/0
+    leftfirewall=yes
+    right=%any
+    rightsourceip=10.0.8.0/24
+    auto=add
+    keyexchange=ikev1
+
+# left is local, right is access client
+conn nat-t
+    left=%defaultroute
+    leftsubnet=0.0.0.0/0
+    leftfirewall=yes
+    right=%any
+    rightsourceip=10.0.5.0/24
+    auto=add
+EOF
+}
+
+init_ipsec_config_for_ap() {
+    local tv_server_address="$1"
+
+    cat <<EOF
+conn %default
+    ikelifetime=60m
+    keylife=20m
+    rekeymargin=3m
+    keyingtries=1
+    keyexchange=ikev2
+    authby=secret
+    forceencaps=yes
+
+conn relay
+    left=%defaultroute
+    leftsourceip=10.0.5.8
+    right=${tv_server_address}
+    rightid=172.17.0.6
+    auto=start
+    keyexchange=ikev1
+EOF
 }
 
 init_mobileconfig() {
@@ -132,7 +198,7 @@ get_public_ip() {
     curl -s https://api.ipify.org
 }
 
-main() {
+main_fetch() {
     local server_address secret
 
     server_address=$(get_public_ip)
@@ -141,7 +207,8 @@ main() {
     # Initialize if did not
     if [ ! -f "$CONFIG_IPSEC_SECRETS_PATH" ]; then
         echo "ck-vpn: initializing"
-        init_ipsec_config "$secret" >"$CONFIG_IPSEC_SECRETS_PATH"
+        init_ipsec_secret "$secret" >"$CONFIG_IPSEC_SECRETS_PATH"
+        init_ipsec_config >/etc/ipsec.conf
         init_mobileconfig "$server_address" "$secret" >"$CONFIG_MOBILECONFIG_PATH"
     fi
 
@@ -155,6 +222,26 @@ main() {
 
     echo "ck-vpn: starting ipsec"
     /usr/sbin/ipsec start --nofork $CK_VPN_IPSEC_DEBUG_OPTS
+}
+
+main_ap() {
+    # Initialize if did not
+    if [ ! -f "$CONFIG_IPSEC_SECRETS_PATH" ]; then
+        echo "ck-vpn: initializing"
+    fi
+
+    init_ipsec_config_for_ap "$CONFIG_FETCH_SERVER" >/etc/ipsec.conf
+    init_ipsec_secret "$CONFIG_FETCH_SECRET" >/etc/ipsec.secrets
+
+    echo "ck-vpn: configuring route tables"
+    config_route "$CONFIG_VIP"
+
+    echo "ck-vpn: starting ipsec"
+    /usr/sbin/ipsec start --nofork $CK_VPN_IPSEC_DEBUG_OPTS
+}
+
+main() {
+    main_ap "$@"
 }
 
 # [[ "$0" == "$BASH_SOURCE" ]] && main "$@"

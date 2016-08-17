@@ -7,7 +7,7 @@ debug:
 	# TODO: Reduce permission required
 	# See https://docs.docker.com/engine/reference/run/#/runtime-privilege-and-linux-capabilities
 	# docker run --rm -it --privileged -p 500:500/udp -p 4500:4500/udp -v $(PWD)/debug.etc:/etc --name ck-vpn-debug ck-vpn
-	docker run --rm -it --privileged -p 80:80 -p 500:500/udp -p 4500:4500/udp --name ck-vpn-debug -e 'IPSEC_DEBUG_OPTIONS=--debug-all' ck-vpn
+	docker run --rm -it --privileged --cap-add=ALL -p 80:80 -p 500:500/udp -p 4500:4500/udp --name ck-vpn-debug -e 'IPSEC_DEBUG_OPTIONS=--debug-all' ck-vpn
 
 debug-shell:
 	docker exec -it --privileged ck-vpn-debug /bin/sh
