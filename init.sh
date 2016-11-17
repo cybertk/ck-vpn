@@ -43,6 +43,7 @@ init_ipsec_config() {
     local secret="$1"
 
     echo ": PSK \"$secret\""
+    echo "ckvpn : EAP \"$secret\""
 }
 
 init_mobileconfig() {
